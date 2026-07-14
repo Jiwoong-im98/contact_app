@@ -37,7 +37,7 @@ def login(loginData: schemas.SignupIn, response: Response, db: Session = Depends
         raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다")
 
     sessionId = crud.createLoginSession(db, user.id)
-    response.set_cookie("session_id", sessionId, httponly=True)
+    response.set_cookie("session_id", sessionId, httponly=True, path="/", samesite="lax")
 
     return {"message": "로그인 성공"}
 
@@ -47,7 +47,7 @@ def logout(response: Response, user: models.User = Depends(getCurrentUser), db: 
     if session_id:
         crud.deleteLoginSession(db, session_id)
 
-    response.delete_cookie("session_id")
+    response.delete_cookie("session_id", path="/")
     return {"message": "로그아웃 되었습니다"}
 
 
