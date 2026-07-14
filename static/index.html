@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연락처 관리 서비스</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 로그인 섹션 */
+        #loginSection {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        #loginSection.show {
+            display: block;
+        }
+
+        #loginSection h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .formGroup {
+            margin-bottom: 15px;
+        }
+
+        .formGroup label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .formGroup input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .buttonGroup {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .buttonGroup button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #loginBtn, #signupBtn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #loginBtn:hover, #signupBtn:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        /* 관리 섹션 */
+        #adminSection {
+            display: none;
+        }
+
+        #adminSection.show {
+            display: block;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+        }
+
+        .userInfo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logoutBtn {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .logoutBtn:hover {
+            background-color: #5a6268;
+        }
+
+        .mainContent {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .formGroup {
+            margin-bottom: 15px;
+        }
+
+        .formGroup input,
+        .formGroup select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .buttonGroup button {
+            padding: 8px 15px;
+            margin-right: 5px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .addBtn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .addBtn:hover {
+            background-color: #218838;
+        }
+
+        .editBtn {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .editBtn:hover {
+            background-color: #138496;
+        }
+
+        .deleteBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .deleteBtn:hover {
+            background-color: #c82333;
+        }
+
+        .list {
+            margin-top: 20px;
+        }
+
+        .listItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .listItem:hover {
+            background-color: #f0f0f0;
+        }
+
+        .listItemContent {
+            flex: 1;
+        }
+
+        .listItemActions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .listItemActions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .searchBox {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .searchBox input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .searchBox button {
+            padding: 8px 15px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .searchBox button:hover {
+            background-color: #138496;
+        }
+
+        .total {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .mainContent {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 로그인/회원가입 섹션 -->
+        <div id="loginSection">
+            <h1>연락처 관리 서비스</h1>
+
+            <div id="loginMessage" class="message"></div>
+
+            <div class="formGroup">
+                <label for="loginUsername">아이디</label>
+                <input type="text" id="loginUsername" placeholder="영문 소문자·숫자 4~20자">
+            </div>
+
+            <div class="formGroup">
+                <label for="loginPassword">비밀번호</label>
+                <input type="password" id="loginPassword" placeholder="4~20자">
+            </div>
+
+            <div class="buttonGroup">
+                <button id="loginBtn">로그인</button>
+                <button id="signupBtn">회원가입</button>
+            </div>
+        </div>
+
+        <!-- 관리 섹션 -->
+        <div id="adminSection">
+            <div class="header">
+                <h1>연락처 관리 서비스</h1>
+                <div class="userInfo">
+                    <span id="username"></span>님
+                    <button class="logoutBtn" id="logoutBtn">로그아웃</button>
+                </div>
+            </div>
+
+            <div class="mainContent">
+                <!-- 연락처 섹션 -->
+                <div class="section">
+                    <h2>연락처 추가</h2>
+
+                    <div class="formGroup">
+                        <label for="contactName">이름</label>
+                        <input type="text" id="contactName" placeholder="1~5자">
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="contactPhone">전화번호</label>
+                        <input type="text" id="contactPhone" placeholder="01012345678">
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="contactAddr">주소</label>
+                        <input type="text" id="contactAddr" placeholder="선택사항">
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="contactCategory">종류</label>
+                        <select id="contactCategory"></select>
+                    </div>
+
+                    <button class="addBtn" id="addContactBtn">추가</button>
+
+                    <div class="searchBox">
+                        <input type="text" id="searchInput" placeholder="이름으로 검색">
+                        <button id="searchBtn">검색</button>
+                        <button id="allBtn">전체</button>
+                    </div>
+
+                    <div class="total" id="contactTotal"></div>
+
+                    <div class="list" id="contactList"></div>
+                </div>
+
+                <!-- 카테고리 섹션 -->
+                <div class="section">
+                    <h2>카테고리 관리</h2>
+
+                    <div class="formGroup">
+                        <label for="categoryName">카테고리명</label>
+                        <input type="text" id="categoryName" placeholder="1~10자">
+                    </div>
+
+                    <button class="addBtn" id="addCategoryBtn">추가</button>
+
+                    <div class="list" id="categoryList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
