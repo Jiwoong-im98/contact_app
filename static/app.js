@@ -34,19 +34,22 @@ async function handleSignup() {
         return;
     }
 
-    const response = await fetch('/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
+    try {
+        const response = await fetch('/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
 
-    if (response.status === 201) {
-        messageEl.textContent = '가입 완료! 로그인해 주세요';
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-    } else {
-        const error = await response.json();
-        messageEl.textContent = error.detail || '가입 실패';
+        if (response.status === 201) {
+            messageEl.textContent = '가입 완료! 로그인해 주세요';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        } else {
+            messageEl.textContent = '회원가입에 실패했습니다';
+        }
+    } catch (error) {
+        messageEl.textContent = '회원가입에 실패했습니다';
     }
 }
 
@@ -61,18 +64,25 @@ async function handleLogin() {
         return;
     }
 
-    const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
+    try {
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
 
-    if (response.status === 200) {
-        const user = await fetch('/auth/me').then(r => r.json());
-        showManagementSection(user.username);
-        await loadCategories();
-        await loadContacts();
-    } else {
+        if (response.status === 200) {
+            const user = await fetch('/auth/me').then(r => r.json());
+            showManagementSection(user.username);
+            await loadCategories();
+            await loadContacts();
+            messageEl.textContent = '';
+        } else if (response.status === 422) {
+            messageEl.textContent = '아이디 형식이 올바르지 않습니다';
+        } else {
+            messageEl.textContent = '아이디 또는 비밀번호가 올바르지 않습니다';
+        }
+    } catch (error) {
         messageEl.textContent = '아이디 또는 비밀번호가 올바르지 않습니다';
     }
 }
