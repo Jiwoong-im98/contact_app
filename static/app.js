@@ -157,19 +157,26 @@ async function handleAddCategory() {
         return;
     }
 
-    const response = await fetch('/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-    });
+    try {
+        const response = await fetch('/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
 
-    if (response.status === 201) {
-        nameInput.value = '';
-        showInfo('카테고리가 추가되었습니다');
-        await loadCategories();
-    } else {
-        const error = await response.json();
-        showError(error.detail || '카테고리 추가 실패');
+        if (response.status === 201) {
+            nameInput.value = '';
+            showInfo('카테고리가 추가되었습니다');
+            await loadCategories();
+        } else if (response.status === 422) {
+            showError('형식이 올바르지 않습니다');
+        } else if (response.status === 409) {
+            showError('이미 있는 카테고리입니다');
+        } else {
+            showError('카테고리 추가 실패');
+        }
+    } catch (error) {
+        showError('카테고리 추가 실패');
     }
 }
 
@@ -258,22 +265,27 @@ async function handleAddContact() {
         return;
     }
 
-    const response = await fetch('/contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, addr, category_id: parseInt(categoryId) })
-    });
+    try {
+        const response = await fetch('/contacts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, addr, category_id: parseInt(categoryId) })
+        });
 
-    if (response.status === 201) {
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactPhone').value = '';
-        document.getElementById('contactAddr').value = '';
-        document.getElementById('contactCategory').value = '';
-        showInfo('연락처가 추가되었습니다');
-        await loadContacts();
-    } else {
-        const error = await response.json();
-        showError(error.detail || '연락처 추가 실패');
+        if (response.status === 201) {
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactAddr').value = '';
+            document.getElementById('contactCategory').value = '';
+            showInfo('연락처가 추가되었습니다');
+            await loadContacts();
+        } else if (response.status === 422) {
+            showError('형식이 올바르지 않습니다');
+        } else {
+            showError('연락처 추가 실패');
+        }
+    } catch (error) {
+        showError('연락처 추가 실패');
     }
 }
 
@@ -345,29 +357,34 @@ async function handleUpdateContact(originalOnclick) {
         return;
     }
 
-    const response = await fetch(`/contacts/${editingContactId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, addr, category_id: parseInt(categoryId) })
-    });
+    try {
+        const response = await fetch(`/contacts/${editingContactId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, addr, category_id: parseInt(categoryId) })
+        });
 
-    if (response.status === 200) {
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactPhone').value = '';
-        document.getElementById('contactAddr').value = '';
-        document.getElementById('contactCategory').value = '';
-        showInfo('연락처가 수정되었습니다');
+        if (response.status === 200) {
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactAddr').value = '';
+            document.getElementById('contactCategory').value = '';
+            showInfo('연락처가 수정되었습니다');
 
-        // 버튼 원래대로 돌리기
-        const addBtn = document.querySelector('.form-section button');
-        addBtn.textContent = '추가';
-        addBtn.onclick = function() { handleAddContact(); };
+            // 버튼 원래대로 돌리기
+            const addBtn = document.querySelector('.form-section button');
+            addBtn.textContent = '추가';
+            addBtn.onclick = function() { handleAddContact(); };
 
-        editingContactId = null;
-        await loadContacts();
-    } else {
-        const error = await response.json();
-        showError(error.detail || '연락처 수정 실패');
+            editingContactId = null;
+            await loadContacts();
+        } else if (response.status === 422) {
+            showError('형식이 올바르지 않습니다');
+        } else {
+            showError('연락처 수정 실패');
+        }
+    } catch (error) {
+        showError('연락처 수정 실패');
     }
 }
 
